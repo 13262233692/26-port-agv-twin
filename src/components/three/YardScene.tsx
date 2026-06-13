@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useTwinStore } from '@/stores/twinStore'
 import YardLights from './YardLights'
-import YardGround from './YardGround'
+import YardModelLoader from './YardModelLoader'
 import ContainerInstancedMesh from './ContainerInstancedMesh'
 import RMGModel from './RMGModel'
 import YardCamera from './YardCamera'
@@ -12,6 +12,7 @@ import ContainerInfoPopup from './ContainerInfoPopup'
 export default function YardScene() {
   const rmgDevices = useTwinStore((state) => state.rmgDevices)
   const selectedDeviceId = useTwinStore((state) => state.selectedDeviceId)
+  const modelUrl = import.meta.env.VITE_YARD_MODEL_URL as string | undefined
 
   const hasSelectedContainer = selectedDeviceId?.startsWith('container-') || false
 
@@ -34,7 +35,7 @@ export default function YardScene() {
       <fog attach="fog" args={['#0A1628', 200, 500]} />
 
       <YardLights />
-      <YardGround />
+      <YardModelLoader modelUrl={modelUrl} useWorker />
       <ContainerInstancedMesh />
 
       {rmgDevices.map((device) => (

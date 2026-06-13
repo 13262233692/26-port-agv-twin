@@ -66,6 +66,7 @@ const KPIPanel: React.FC = () => {
   const rmgDevices = useTwinStore((state) => state.rmgDevices);
   const alarms = useTwinStore((state) => state.alarms);
   const yardStats = useTwinStore((state) => state.yardStats);
+  const modelStats = useTwinStore((state) => state.modelStats);
 
   const onlineCount = rmgDevices.filter((d) => d.status === 'online').length;
   const activeAlarmCount = alarms.filter(
@@ -125,6 +126,66 @@ const KPIPanel: React.FC = () => {
           valueColor={hasCriticalAlarm ? 'text-dark-red' : 'text-amber-orange'}
         />
       </div>
+
+      {modelStats && (
+        <div className="mt-4 pt-4 border-t border-steel-gray/50">
+          <h3 className="font-display text-sm font-semibold text-tech-cyan mb-2">
+            几何合并性能
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">原始 Mesh</p>
+              <p className="font-mono text-sm text-white">
+                {modelStats.originalMeshCount.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">合并后 Mesh</p>
+              <p className="font-mono text-sm text-tech-cyan">
+                {modelStats.mergedMeshCount}
+              </p>
+            </div>
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">材质分组</p>
+              <p className="font-mono text-sm text-ice-blue">
+                {modelStats.materialCount}
+              </p>
+            </div>
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">Draw Call</p>
+              <p className="font-mono text-sm text-amber-orange">
+                {modelStats.mergedMeshCount + 3}
+              </p>
+            </div>
+            <div className="col-span-2 bg-steel-gray/30 rounded p-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-ice-blue">合并优化率</span>
+                <span className="font-mono text-xs text-tech-cyan">
+                  {modelStats.originalMeshCount > 0
+                    ? ((1 - modelStats.mergedMeshCount / modelStats.originalMeshCount) * 100).toFixed(1)
+                    : 0}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-steel-gray/50 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-tech-cyan to-ice-blue"
+                  style={{
+                    width: modelStats.originalMeshCount > 0
+                      ? `${(1 - modelStats.mergedMeshCount / modelStats.originalMeshCount) * 100}%`
+                      : '0%',
+                  }}
+                />
+              </div>
+            </div>
+            <div className="col-span-2 bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue mb-1">总顶点数 / 三角形</p>
+              <p className="font-mono text-xs text-white">
+                {modelStats.totalVertices.toLocaleString()} / {modelStats.totalTriangles.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

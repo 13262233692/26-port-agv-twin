@@ -1,12 +1,21 @@
 import { create } from 'zustand'
 import type { PLCDataFrame, RMGDeviceState, ContainerState, AlarmEvent, YardLayout, YardStats, CameraMode } from '../../shared/types'
 
+interface ModelStats {
+  originalMeshCount: number
+  mergedMeshCount: number
+  materialCount: number
+  totalVertices: number
+  totalTriangles: number
+}
+
 interface TwinState {
   rmgDevices: RMGDeviceState[]
   containers: ContainerState[]
   alarms: AlarmEvent[]
   yardLayout: YardLayout | null
   yardStats: YardStats | null
+  modelStats: ModelStats | null
   selectedDeviceId: string | null
   cameraMode: CameraMode
   connected: boolean
@@ -17,6 +26,7 @@ interface TwinActions {
   updateFrame: (data: PLCDataFrame) => void
   setYardLayout: (layout: YardLayout) => void
   setYardStats: (stats: YardStats) => void
+  setModelStats: (stats: ModelStats) => void
   selectDevice: (id: string | null) => void
   setCameraMode: (mode: CameraMode) => void
   setConnected: (value: boolean) => void
@@ -29,6 +39,7 @@ export const useTwinStore = create<TwinState & TwinActions>((set) => ({
   alarms: [],
   yardLayout: null,
   yardStats: null,
+  modelStats: null,
   selectedDeviceId: null,
   cameraMode: 'overview',
   connected: false,
@@ -41,6 +52,7 @@ export const useTwinStore = create<TwinState & TwinActions>((set) => ({
     }),
   setYardLayout: (layout) => set({ yardLayout: layout }),
   setYardStats: (stats) => set({ yardStats: stats }),
+  setModelStats: (stats) => set({ modelStats: stats }),
   selectDevice: (id) => set({ selectedDeviceId: id }),
   setCameraMode: (mode) => set({ cameraMode: mode }),
   setConnected: (value) => set({ connected: value }),
