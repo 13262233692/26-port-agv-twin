@@ -67,12 +67,19 @@ const KPIPanel: React.FC = () => {
   const alarms = useTwinStore((state) => state.alarms);
   const yardStats = useTwinStore((state) => state.yardStats);
   const modelStats = useTwinStore((state) => state.modelStats);
+  const collisionStats = useTwinStore((state) => state.collisionStats);
+  const activeCollisions = useTwinStore((state) => state.activeCollisions);
+  const activeIntercepts = useTwinStore((state) => state.activeIntercepts);
 
   const onlineCount = rmgDevices.filter((d) => d.status === 'online').length;
   const activeAlarmCount = alarms.filter(
     (a) => a.level === 'critical' || a.level === 'warning'
   ).length;
   const hasCriticalAlarm = alarms.some((a) => a.level === 'critical');
+
+  const activeCriticalCount = activeCollisions.filter((c) => c.level === 'critical').length;
+  const activeWarningCount = activeCollisions.filter((c) => c.level === 'warning').length;
+  const activeInterceptCount = activeIntercepts.length;
 
   return (
     <div
@@ -184,6 +191,66 @@ const KPIPanel: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {collisionStats && (
+        <div className="mt-4 pt-4 border-t border-steel-gray/50">
+          <h3 className="font-display text-sm font-semibold text-dark-red mb-2 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            碰撞预警系统
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div className={`rounded p-2 ${activeCriticalCount > 0 ? 'bg-dark-red/30' : 'bg-steel-gray/30'}`}>
+              <p className="text-xs text-ice-blue">严重碰撞</p>
+              <p className={`font-mono text-xl font-bold ${activeCriticalCount > 0 ? 'text-dark-red animate-pulse' : 'text-steel-gray'}`}>
+                {activeCriticalCount}
+              </p>
+            </div>
+            <div className={`rounded p-2 ${activeWarningCount > 0 ? 'bg-amber-orange/30' : 'bg-steel-gray/30'}`}>
+              <p className="text-xs text-ice-blue">接近预警</p>
+              <p className={`font-mono text-xl font-bold ${activeWarningCount > 0 ? 'text-amber-orange' : 'text-steel-gray'}`}>
+                {activeWarningCount}
+              </p>
+            </div>
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">拦截次数</p>
+              <p className="font-mono text-sm text-dark-red">
+                {collisionStats.interceptionsSent}
+              </p>
+            </div>
+            <div className="bg-steel-gray/30 rounded p-2">
+              <p className="text-xs text-ice-blue">检测耗时</p>
+              <p className="font-mono text-sm text-tech-cyan">
+                {collisionStats.avgCheckTimeMs.toFixed(2)}ms
+              </p>
+            </div>
+            <div className="col-span-2 bg-steel-gray/30 rounded p-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-ice-blue">BVH 检测节点</span>
+                <span className="font-mono text-xs text-white">
+                  {collisionStats.totalChecks.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-ice-blue">激活拦截</span>
+                <span className={`font-mono text-xs ${activeInterceptCount > 0 ? 'text-dark-red' : 'text-steel-gray'}`}>
+                  {activeInterceptCount} 台
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {activeCriticalCount > 0 && (
+            <div className="mt-2 px-3 py-2 bg-dark-red/20 border border-dark-red/50 rounded animate-pulse">
+              <p className="text-xs text-dark-red font-semibold">
+                ⚠️ 安全距离已突破 200mm 红线
+              </p>
+              <p className="text-xs text-ice-blue mt-0.5">
+                PLC 反向熔断已触发
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { PLCDataFrame, RMGDeviceState, ContainerState, AlarmEvent, YardLayout, YardStats, CameraMode } from '../../shared/types'
+import type { ActiveCollision, CollisionStats } from '@/engine/collisionWarningSystem'
 
 interface ModelStats {
   originalMeshCount: number
@@ -16,6 +17,9 @@ interface TwinState {
   yardLayout: YardLayout | null
   yardStats: YardStats | null
   modelStats: ModelStats | null
+  activeCollisions: ActiveCollision[]
+  collisionStats: CollisionStats | null
+  activeIntercepts: string[]
   selectedDeviceId: string | null
   cameraMode: CameraMode
   connected: boolean
@@ -27,6 +31,11 @@ interface TwinActions {
   setYardLayout: (layout: YardLayout) => void
   setYardStats: (stats: YardStats) => void
   setModelStats: (stats: ModelStats) => void
+  setActiveCollisions: (collisions: ActiveCollision[]) => void
+  setCollisionStats: (stats: CollisionStats) => void
+  addIntercept: (rmgId: string) => void
+  removeIntercept: (rmgId: string) => void
+  addAlarm: (alarm: AlarmEvent) => void
   selectDevice: (id: string | null) => void
   setCameraMode: (mode: CameraMode) => void
   setConnected: (value: boolean) => void
@@ -40,6 +49,9 @@ export const useTwinStore = create<TwinState & TwinActions>((set) => ({
   yardLayout: null,
   yardStats: null,
   modelStats: null,
+  activeCollisions: [],
+  collisionStats: null,
+  activeIntercepts: [],
   selectedDeviceId: null,
   cameraMode: 'overview',
   connected: false,
@@ -53,6 +65,19 @@ export const useTwinStore = create<TwinState & TwinActions>((set) => ({
   setYardLayout: (layout) => set({ yardLayout: layout }),
   setYardStats: (stats) => set({ yardStats: stats }),
   setModelStats: (stats) => set({ modelStats: stats }),
+  setActiveCollisions: (collisions) => set({ activeCollisions: collisions }),
+  setCollisionStats: (stats) => set({ collisionStats: stats }),
+  addIntercept: (rmgId) => set((state) => ({
+    activeIntercepts: state.activeIntercepts.includes(rmgId)
+      ? state.activeIntercepts
+      : [...state.activeIntercepts, rmgId],
+  })),
+  removeIntercept: (rmgId) => set((state) => ({
+    activeIntercepts: state.activeIntercepts.filter((id) => id !== rmgId),
+  })),
+  addAlarm: (alarm) => set((state) => ({
+    alarms: [alarm, ...state.alarms].slice(0, 100),
+  })),
   selectDevice: (id) => set({ selectedDeviceId: id }),
   setCameraMode: (mode) => set({ cameraMode: mode }),
   setConnected: (value) => set({ connected: value }),

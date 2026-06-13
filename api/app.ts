@@ -24,7 +24,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
     status: allConnected ? 'ok' : 'degraded',
     modbusConnections: connections,
     wsClients: websocketService.getClientCount(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    activeIntercepts: websocketService.getActiveIntercepts().length,
   }
   res.json(health)
 })

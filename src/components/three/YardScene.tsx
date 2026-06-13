@@ -8,6 +8,7 @@ import RMGModel from './RMGModel'
 import YardCamera from './YardCamera'
 import PostEffects from './PostEffects'
 import ContainerInfoPopup from './ContainerInfoPopup'
+import CollisionSystem from './CollisionSystem'
 
 export default function YardScene() {
   const rmgDevices = useTwinStore((state) => state.rmgDevices)
@@ -41,6 +42,8 @@ export default function YardScene() {
       {rmgDevices.map((device) => (
         <RMGModel key={device.id} deviceId={device.id} />
       ))}
+
+      <CollisionSystem />
 
       <YardCamera />
       <PostEffects />
